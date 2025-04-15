@@ -113,17 +113,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function saveToLocalStorage(userData) {
         // Get existing data
-        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let users = JSON.parse(localStorage.getItem('user-entries')) || [];
 
         // Add new user
         users.push(userData);
 
         // Save back to localStorage
-        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('user-entries', JSON.stringify(users));
     }
 
     function loadDataFromLocalStorage() {
-        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const users = JSON.parse(localStorage.getItem('user-entries')) || [];
 
         // Clear the table first
         tableBody.innerHTML = '';
