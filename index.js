@@ -145,13 +145,13 @@ document.addEventListener('DOMContentLoaded', function () {
         emailCell.textContent = userData.email;
 
         const passwordCell = document.createElement('td');
-        passwordCell.textContent = '••••••••'; // Mask the password for security
+        passwordCell.textContent = userData.password; // Mask the password for security
 
         const dobCell = document.createElement('td');
         dobCell.textContent = userData.dob;
 
         const termsCell = document.createElement('td');
-        termsCell.textContent = userData.acceptedTerms ? 'Yes' : 'No';
+        termsCell.textContent = userData.acceptedTerms;
 
         // Add cells to row
         row.appendChild(nameCell);
