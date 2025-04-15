@@ -48,12 +48,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Email validation
         const email = document.getElementById('email').value;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            displayError('emailError', 'Please enter a valid email address');
-            isValid = false;
-        }
-
+const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+if (email.trim() === '') {
+    displayError('emailError', 'Email is required');
+    isValid = false;
+} else if (!emailRegex.test(email)) {
+    displayError('emailError', 'Please enter a valid email address');
+    isValid = false;
+}
         // Password validation
         const password = document.getElementById('password').value;
         if (password.length < 8) {
