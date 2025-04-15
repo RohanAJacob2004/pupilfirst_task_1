@@ -54,13 +54,6 @@ document.addEventListener('DOMContentLoaded', function () {
             emailElement.reportValidity();
         }
 
-        // Password validation
-        const password = document.getElementById('password').value;
-        if (password.length < 8) {
-            displayError('passwordError', 'Password must be at least 8 characters');
-            isValid = false;
-        }
-
         // Date of birth validation
         const dob = document.getElementById('dob').value;
         if (!dob) {
