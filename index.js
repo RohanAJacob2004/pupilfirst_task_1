@@ -2,6 +2,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const userForm = document.getElementById('userForm');
     const tableBody = document.getElementById('tableBody');
 
+    // Add email validation event listeners
+    const email = document.getElementById('email');
+    email.addEventListener('input', () => validate(email));
+
     // Load existing data from localStorage
     loadDataFromLocalStorage();
 
@@ -10,6 +14,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Reset error messages
         clearErrors();
+
+        // Validate email again on submit
+        validate(email);
 
         // Validate the form
         if (validateForm()) {
@@ -33,6 +40,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    function validate(element) {
+        if (element.validity.typeMismatch) {
+            element.setCustomValidity("The Email is not in the right format!!!");
+            element.reportValidity();
+        } else {
+            element.setCustomValidity('');
+        }
+    }
+
     function validateForm() {
         let isValid = true;
 
@@ -46,12 +62,10 @@ document.addEventListener('DOMContentLoaded', function () {
             isValid = false;
         }
 
-        // Email validation - use built-in HTML validation
+        // Email validation is now handled by the validate function
         const emailElement = document.getElementById('email');
         if (!emailElement.checkValidity()) {
             isValid = false;
-            // Let the browser show its own error
-            emailElement.reportValidity();
         }
 
         // Date of birth validation
