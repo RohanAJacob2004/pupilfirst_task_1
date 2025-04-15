@@ -2,10 +2,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const userForm = document.getElementById('userForm');
     const tableBody = document.getElementById('tableBody');
 
-    // Add email input validation
-    const email = document.getElementById('email');
-    email.addEventListener('input', () => validateEmail(email));
-
     // Load existing data from localStorage
     loadDataFromLocalStorage();
 
@@ -14,9 +10,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Reset error messages
         clearErrors();
-
-        // Make sure to validate email again on submit
-        validateEmail(document.getElementById('email'));
 
         // Validate the form
         if (validateForm()) {
@@ -40,18 +33,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    function validateEmail(element) {
-        if (element.validity.typeMismatch) {
-            element.setCustomValidity("The Email is not in the right format!!!");
-            document.getElementById('emailError').textContent = "The Email is not in the right format!!!";
-            return false;
-        } else {
-            element.setCustomValidity('');
-            document.getElementById('emailError').textContent = '';
-            return true;
-        }
-    }
-
     function validateForm() {
         let isValid = true;
 
@@ -65,13 +46,12 @@ document.addEventListener('DOMContentLoaded', function () {
             isValid = false;
         }
 
-        // Email validation - now using Constraint Validation API
+        // Email validation - use built-in HTML validation
         const emailElement = document.getElementById('email');
-        if (emailElement.value.trim() === '') {
-            displayError('emailError', 'Email is required');
+        if (!emailElement.checkValidity()) {
             isValid = false;
-        } else if (!validateEmail(emailElement)) {
-            isValid = false;
+            // Let the browser show its own error
+            emailElement.reportValidity();
         }
 
         // Password validation
