@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Email validation with explicit regex
         const email = document.getElementById('email').value;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+         const emailRegex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
         if (email.trim() === '') {
             displayError('emailError', 'Email is required');
             isValid = false;
