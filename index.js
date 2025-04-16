@@ -64,8 +64,13 @@ document.addEventListener('DOMContentLoaded', function () {
             isValid = false;
         }
 
-        // Remove custom email validation with regex
-        // Email will be validated by the browser's built-in validation
+        // Email validation - Add custom validation with regex
+        const email = document.getElementById('email').value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            displayError('emailError', 'Please enter a valid email address');
+            isValid = false;
+        }
 
         // Date of birth validation
         const dob = document.getElementById('dob').value;
@@ -144,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
         emailCell.textContent = userData.email;
 
         const passwordCell = document.createElement('td');
-        passwordCell.textContent = userData.password; // Mask the password for security
+        passwordCell.textContent = userData.password; // Storing as plaintext as requested
 
         const dobCell = document.createElement('td');
         dobCell.textContent = userData.dob;
@@ -163,4 +168,3 @@ document.addEventListener('DOMContentLoaded', function () {
         tableBody.appendChild(row);
     }
 });
-
