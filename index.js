@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const userForm = document.getElementById('userForm');
+    const userForm = document.getElementById('user-form');
     const tableBody = document.getElementById('tableBody');
 
     // Add email validation event listeners
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Email validation with explicit regex
         const email = document.getElementById('email').value;
-         const emailRegex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+        const emailRegex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
         if (email.trim() === '') {
             displayError('emailError', 'Email is required');
             isValid = false;
