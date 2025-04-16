@@ -62,9 +62,14 @@ document.addEventListener('DOMContentLoaded', function () {
             isValid = false;
         }
 
-        // Email validation is now handled by the validate function
-        const emailElement = document.getElementById('email');
-        if (!emailElement.checkValidity()) {
+        // Email validation with explicit regex
+        const email = document.getElementById('email').value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email.trim() === '') {
+            displayError('emailError', 'Email is required');
+            isValid = false;
+        } else if (!emailRegex.test(email)) {
+            displayError('emailError', 'Please enter a valid email address');
             isValid = false;
         }
 
