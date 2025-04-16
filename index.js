@@ -3,8 +3,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const tableBody = document.getElementById('tableBody');
 
     // Add email validation event listeners
-    const email = document.getElementById('email');
-    email.addEventListener('input', () => validate(email));
+    const emailInput = document.getElementById('email');
+    emailInput.addEventListener('input', function() {
+        // Use browser's built-in validation
+        if (emailInput.validity.typeMismatch) {
+            emailInput.setCustomValidity("The Email is not in the right format!!!");
+            emailInput.reportValidity();
+        } else {
+            emailInput.setCustomValidity('');
+        }
+    });
 
     // Load existing data from localStorage
     loadDataFromLocalStorage();
@@ -15,8 +23,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // Reset error messages
         clearErrors();
 
-        // Validate email again on submit
-        validate(email);
+        // Force browser validation on email before form validation
+        if (emailInput.validity.typeMismatch) {
+            emailInput.reportValidity();
+            return; // Stop form submission if email is invalid
+        }
 
         // Validate the form
         if (validateForm()) {
@@ -40,15 +51,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    function validate(element) {
-        if (element.validity.typeMismatch) {
-            element.setCustomValidity("The Email is not in the right format!!!");
-            element.reportValidity();
-        } else {
-            element.setCustomValidity('');
-        }
-    }
-
     function validateForm() {
         let isValid = true;
 
@@ -62,16 +64,8 @@ document.addEventListener('DOMContentLoaded', function () {
             isValid = false;
         }
 
-        // Email validation with explicit regex
-        const email = document.getElementById('email').value;
-        const emailRegex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-        if (email.trim() === '') {
-            displayError('emailError', 'Email is required');
-            isValid = false;
-        } else if (!emailRegex.test(email)) {
-            displayError('emailError', 'Please enter a valid email address');
-            isValid = false;
-        }
+        // Remove custom email validation with regex
+        // Email will be validated by the browser's built-in validation
 
         // Date of birth validation
         const dob = document.getElementById('dob').value;
@@ -100,13 +94,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 displayError('dobError', 'Age cannot be more than 55 years');
                 isValid = false;
             }
-        }
-
-        // Terms validation
-        const acceptTerms = document.getElementById('acceptTerms').checked;
-        if (!acceptTerms) {
-            displayError('termsError', 'You must accept the terms and conditions');
-            isValid = false;
         }
 
         return isValid;
