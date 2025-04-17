@@ -1,142 +1,166 @@
-const email = document.getElementById("email");
-const password = document.getElementById("password");
-const Name = document.getElementById("name");
-const dob = document.getElementById("dob");
+document.addEventListener('DOMContentLoaded', function () {
+    const userForm = document.getElementById('user-form');
+    const tableBody = document.getElementById('tableBody');
 
-email.addEventListener("input", () => validate(email));
-// Add validation for name input
-Name.addEventListener("input", () => validateName(Name));
-// Add validation for dob input
-dob.addEventListener("input", () => validateDOB(dob));
+    // Add email validation event listeners
+    const emailInput = document.getElementById('email');
+    emailInput.addEventListener('input', function () {
+        // Use browser's built-in validation
+        if (emailInput.validity.typeMismatch) {
+            emailInput.setCustomValidity("The Email is not in the right format!!!");
+            emailInput.reportValidity();
+        } else {
+            emailInput.setCustomValidity('');
+        }
+    });
 
-const submit = document.getElementById("submit");
-submit.addEventListener("click", () => validate(email));
-submit.addEventListener("click", () => validateName(Name));
-submit.addEventListener("click", () => validateDOB(dob));
+    // Load existing data from localStorage
+    loadDataFromLocalStorage();
 
-function validate(element) {
-    if (element.validity.typeMismatch) {
-        element.setCustomValidity("Please enter a valid email.");
-        element.reportValidity();
-    }
-    else {
-        element.setCustomValidity("");
-        element.reportValidity();
-    }
-}
+    userForm.addEventListener('submit', function (event) {
+        event.preventDefault();
 
-// Function to validate Name
-function validateName(element) {
-    if (element.value.trim() === "") {
-        element.setCustomValidity("Name cannot be empty.");
-    } else {
-        element.setCustomValidity("");
-    }
-    element.reportValidity();
-}
+        // Reset error messages
+        clearErrors();
 
-// Function to validate Date of Birth
-function validateDOB(element) {
-    const dobValue = new Date(element.value);
-    const today = new Date();
+        // Force browser validation on email before form validation
+        if (emailInput.validity.typeMismatch) {
+            emailInput.reportValidity();
+            return; // Stop form submission if email is invalid
+        }
 
-    // Calculate age
-    const minAgeDate = new Date();
-    minAgeDate.setFullYear(today.getFullYear() - 18);
+        // Validate the form
+        if (validateForm()) {
+            // Get form data
+            const userData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                dob: document.getElementById('dob').value,
+                acceptedTerms: document.getElementById('acceptTerms').checked
+            };
 
-    const maxAgeDate = new Date();
-    maxAgeDate.setFullYear(today.getFullYear() - 55);
+            // Save to localStorage
+            saveToLocalStorage(userData);
 
-    if (dobValue > minAgeDate) {
-        element.setCustomValidity("You must be at least 18 years old.");
-    }
-    else if (dobValue < maxAgeDate) {
-        element.setCustomValidity("You must be less than 55 years old.");
-    }
-    else {
-        element.setCustomValidity("");
-    }
+            // Add to table
+            addRowToTable(userData);
 
-    element.reportValidity();
-}
+            // Reset form
+            userForm.reset();
+        }
+    });
 
-let userForm = document.getElementById("user-form");
-const retrieveEntries = () => {
-    let entries = localStorage.getItem("user-entries");
-    if (entries) {
-        entries = JSON.parse(entries);
-    }
-    else {
-        entries = [];
-    }
-    return entries;
-}
+    function validateForm() {
+        let isValid = true;
 
-let userEntries = retrieveEntries();
+        // Name validation
+        const name = document.getElementById('name').value;
+        if (name.trim() === '') {
+            displayError('nameError', 'Name is required');
+            isValid = false;
+        } else if (name.length < 3) {
+            displayError('nameError', 'Name must be at least 3 characters');
+            isValid = false;
+        }
 
-const displayEntries = () => {
-    const entries = retrieveEntries();
+        // Remove custom email validation with regex
+        // Email will be validated by the browser's built-in validation
 
-    // Fixed: syntax for function and template literals
-    const tableEntries = entries.map((entry) => {
-        const nameCell = `<td class='border px-4 py-2'>${entry.nameValue}</td>`;
-        const emailCell = `<td class='border px-4 py-2'>${entry.emailValue}</td>`;
-        const passwordCell = `<td class='border px-4 py-2'>${entry.passwordValue}</td>`;
-        const dobCell = `<td class='border px-4 py-2'>${entry.dobValue}</td>`;
-        const acceptTermsCell = `<td class='border px-4 py-2'>${entry.acceptedTermsAndconditionsValue ? 'Yes' : 'No'}</td>`;
-        const row = `<tr>${nameCell}${emailCell}${passwordCell}${dobCell}${acceptTermsCell}</tr>`;
-        return row;
-    }).join("\n");
+        // Date of birth validation
+        const dob = document.getElementById('dob').value;
+        if (!dob) {
+            displayError('dobError', 'Date of birth is required');
+            isValid = false;
+        } else {
+            const dobDate = new Date(dob);
+            const today = new Date();
 
-    const table = `<table class="table-auto w-full"><tr>
-        <th class="px-4 py-2">Name</th>
-        <th class="px-4 py-2">Email</th>
-        <th class="px-4 py-2">Password</th>
-        <th class="px-4 py-2">dob</th>
-        <th class="px-4 py-2">accepted terms?</th>
-        </tr>${tableEntries}</table>`;
+            // Calculate min age (18 years ago)
+            const minAgeDate = new Date();
+            minAgeDate.setFullYear(today.getFullYear() - 18);
 
-    let details = document.getElementById("user-entries");
-    details.innerHTML = table; // Fixed: capital 'HTML' in innerHTML
-}
+            // Calculate max age (55 years ago)
+            const maxAgeDate = new Date();
+            maxAgeDate.setFullYear(today.getFullYear() - 55);
 
-const saveUserForm = (event) => {
-    event.preventDefault();
+            if (dobDate > today) {
+                displayError('dobError', 'Date of birth cannot be in the future');
+                isValid = false;
+            } else if (dobDate > minAgeDate) {
+                displayError('dobError', 'You must be at least 18 years old');
+                isValid = false;
+            } else if (dobDate < maxAgeDate) {
+                displayError('dobError', 'Age cannot be more than 55 years');
+                isValid = false;
+            }
+        }
 
-    // Validate inputs before saving
-    validateName(document.getElementById("name"));
-    validate(document.getElementById("email"));
-    validateDOB(document.getElementById("dob"));
-
-    // Get all form controls
-    const form = document.getElementById("user-form");
-
-    // Check if the form is valid
-    if (!form.checkValidity()) {
-        // If not valid, report validity (will show the browser's default error messages)
-        form.reportValidity();
-        return;
+        return isValid;
     }
 
-    const nameValue = document.getElementById("name").value;
-    const emailValue = document.getElementById("email").value;
-    const passwordValue = document.getElementById("password").value;
-    const dobValue = document.getElementById("dob").value;
-    const acceptedTermsAndconditionsValue = document.getElementById("acceptTerms").checked;
-    const entry = {
-        nameValue,
-        emailValue,
-        passwordValue,
-        dobValue,
-        acceptedTermsAndconditionsValue
-    };
-    userEntries.push(entry);
-    localStorage.setItem("user-entries", JSON.stringify(userEntries));
-    displayEntries();
+    function displayError(elementId, message) {
+        document.getElementById(elementId).textContent = message;
+    }
 
-    // Reset the form
-    form.reset();
-}
+    function clearErrors() {
+        const errorElements = document.querySelectorAll('.error');
+        errorElements.forEach(element => {
+            element.textContent = '';
+        });
+    }
 
-userForm.addEventListener("submit", saveUserForm);
-displayEntries();
+    function saveToLocalStorage(userData) {
+        // Get existing data
+        let users = JSON.parse(localStorage.getItem('user-entries')) || [];
+
+        // Add new user
+        users.push(userData);
+
+        // Save back to localStorage
+        localStorage.setItem('user-entries', JSON.stringify(users));
+    }
+
+    function loadDataFromLocalStorage() {
+        const users = JSON.parse(localStorage.getItem('user-entries')) || [];
+
+        // Clear the table first
+        tableBody.innerHTML = '';
+
+        // Add each user to the table
+        users.forEach(user => {
+            addRowToTable(user);
+        });
+    }
+
+    function addRowToTable(userData) {
+        const row = document.createElement('tr');
+
+        // Create cells for each data point
+        const nameCell = document.createElement('td');
+        nameCell.textContent = userData.name;
+
+        const emailCell = document.createElement('td');
+        emailCell.textContent = userData.email;
+
+        const passwordCell = document.createElement('td');
+        passwordCell.textContent = userData.password; // Mask the password for security
+
+        const dobCell = document.createElement('td');
+        dobCell.textContent = userData.dob;
+
+        const termsCell = document.createElement('td');
+        termsCell.textContent = userData.acceptedTerms;
+
+        // Add cells to row
+        row.appendChild(nameCell);
+        row.appendChild(emailCell);
+        row.appendChild(passwordCell);
+        row.appendChild(dobCell);
+        row.appendChild(termsCell);
+
+        // Add row to table
+        tableBody.appendChild(row);
+    }
+});
+
