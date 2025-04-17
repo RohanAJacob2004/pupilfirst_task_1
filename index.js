@@ -64,10 +64,6 @@ document.addEventListener('DOMContentLoaded', function () {
             isValid = false;
         }
 
-        // Remove custom email validation with regex
-        // Email will be validated by the browser's built-in validation
-
-        // Date of birth validation
         const dob = document.getElementById('dob').value;
         if (!dob) {
             displayError('dobError', 'Date of birth is required');
@@ -76,21 +72,22 @@ document.addEventListener('DOMContentLoaded', function () {
             const dobDate = new Date(dob);
             const today = new Date();
 
-            // Calculate min age (18 years ago)
-            const minAgeDate = new Date();
-            minAgeDate.setFullYear(today.getFullYear() - 18);
+            // Calculate age more accurately
+            let age = today.getFullYear() - dobDate.getFullYear();
 
-            // Calculate max age (55 years ago)
-            const maxAgeDate = new Date();
-            maxAgeDate.setFullYear(today.getFullYear() - 55);
+            // Adjust age if birthday hasn't occurred yet this year
+            const monthDiff = today.getMonth() - dobDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
+                age--;
+            }
 
             if (dobDate > today) {
                 displayError('dobError', 'Date of birth cannot be in the future');
                 isValid = false;
-            } else if (dobDate > minAgeDate) {
+            } else if (age < 18) {
                 displayError('dobError', 'You must be at least 18 years old');
                 isValid = false;
-            } else if (dobDate < maxAgeDate) {
+            } else if (age > 55) {
                 displayError('dobError', 'Age cannot be more than 55 years');
                 isValid = false;
             }
