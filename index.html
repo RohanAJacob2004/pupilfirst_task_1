@@ -48,12 +48,23 @@
         </div>
         <span class="error" id="termsError"></span>
 
-        <button type="submit" id="submit">Submit</button>
+        <button type="submit">Submit</button>
       </form>
 
       <div class="table-container">
         <h2>Submitted Users</h2>
-        <div id="user-entries"></div>
+        <table id="userTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Password</th>
+              <th>Dob</th>
+              <th>Accepted terms?</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
       </div>
     </div>
 
